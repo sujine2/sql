@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+{% if data %}
+    <h1> Try Attack Query</h1>
+    <td rowspan="1" colspan="3" style="vertical-align: top; width: 30%;">
+    <textarea rows="8" cols="85">{{ data }}&#10;</textarea>
+        {% if single %}
+            <h1> Result : success double quote.</h1>
+        {% elif double %}
+            <h1> Result : success single quote.</h1>
+        {% elif integer %}
+            <h1> Result : success integer. </h1>
+        {% else %}
+            <h1> Result :  Fail </h1>
+        {% endif %}
+
+<form action="/retry/", method="POST">
+{% csrf_token %}
+                Query
+    <!--<input type="text" value='쿼리 수정하기' onfocus="this.value='english';this.style.color='red';" style="color:blue">-->
+    <!--<input type="text" id="query" name="query" value="" >-->
+    <input type="text" id="requery" name = "requery" list="depList">
+    <datalist id="depList">
+        {% for i in list %}
+        <option value="{{ i }}"></option>
+        {% endfor %}
+    </datalist>
+    <input type="hidden" id="origin" name="origin" value="{{ origin }}" >
+    <input type="submit" value="retry">
+</form>
+{% endif %}
+
+
+{% if ttt %}
+ <h1> Retry Attack Query</h1>
+    <td rowspan="1" colspan="3" style=" width: 30%;">
+    <textarea rows="8" cols="85">{{ ttt }}</textarea>
+        {% if s%}
+            <h1> Result : Retry Success </h1>
+        {% elif f %}
+            <h1> Result : Retry Fail </h1>
+        {% endif %}
+</td>
+{% endif %}
+
+</body>
+</html>

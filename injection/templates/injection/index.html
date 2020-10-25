@@ -1,0 +1,39 @@
+<html>
+<title>테스트</title>
+<body>
+<form action="/" method="POST">
+{% csrf_token %}
+    <h1>Base Info</h1>
+    <p>URL: <input type="text" name="url"> </p>
+    <p>COOKIE: <input type="text" name="cookie"> </p>
+    <p> FIND: <input type="text" name="find"></p>
+    <h1>PRAMETER</h1>
+    <p> NAME: <input type="text" name="name"> </p>
+    <p> PARAMETER: <input type="text" name="parameter"></p>
+    <br>
+    METHOD
+    <div>
+      <input type="radio" id="get" name="method" value="get" checked>
+      <label for="get">get</label>
+    </div>
+    <div>
+      <input type="radio" id="post" name="method" value="POST">
+      <label for="post">post</label>
+    </div>
+    <br>
+
+    RESULT
+
+    <div>
+      <input type="radio" id="know" name="result" value="know" checked>
+      <label for="know">know</label>
+    </div>
+
+    <div>
+      <input type="radio" id="query" name="result" value="query">
+      <label for="query">query</label>
+    </div>
+    <input type="submit" value="Detections Initiated">
+</form>
+</body>
+</html>
