@@ -1,3 +1,11 @@
 from django.db import models
+from django.conf import settings
+from django.utils import timezone
 
-# Create your models here.
+
+class list (models.Model):
+    query = models.TextField(unique=True)
+    stand = models.TextField(null=True, max_length=200 ,unique=True)
+
+    def __str__(self):
+        return self.query

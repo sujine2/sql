@@ -17,6 +17,22 @@
 <body>
 
 
+{% if data %}
+<form action="/retry/", method="POST">
+{% csrf_token %}
+                Query
+    <!--<input type="text" value='쿼리 수정하기' onfocus="this.value='english';this.style.color='red';" style="color:blue">-->
+    <!--<input type="text" id="query" name="query" value="" >-->
+    <input type="text" id="requery" name = "requery" >
+    <!--<datalist id="depList">
+        {% for i in list %}
+        <option value="{{ i }}"></option>
+        {% endfor %}
+    </datalist>-->
+    <input type="hidden" id="origin" name="origin" value="{{ origin }}" >
+    <input type="submit" value="재시도">
+</form>
+{% endif %}
 
 
 {% if ttt %}
@@ -30,13 +46,15 @@
         {% endif %}
     </td>
 {% endif %}
-
-<!--<form action="/retry/", method="post">-->
+<br>
+<hr>
+<br>
+<form action="/view/search/", method="post">
     {% csrf_token %}
 {% if data %}
     <h1> Try Attack Query</h1>
     <td rowspan="1" colspan="3" style="vertical-align: top; width: 30%;">
-    <textarea name="origin_text" rows="8" cols="85">{{ data }}&#10;</textarea>
+    <textarea rows="8" cols="85">{{ data }}&#10;</textarea>
         {% if single %}
             <h1> Result : success double quote.</h1>
         {% elif double %}
@@ -48,36 +66,13 @@
         {% endif %}
 
 {% endif %}
-{% if pw %}
-        <h1> parmas value : {{pw}} </h1>
-{% endif %}
-<br>
-<hr>
-<br>
-        {% if data %}
-<form action="/retry/", method="POST">
-{% csrf_token %}
-                Query
-    <!--<input type="text" value='쿼리 수정하기' onfocus="this.value='english';this.style.color='red';" style="color:blue">-->
-    <!--<input type="text" id="query" name="query" value="" >-->
-    <input type="text" id="requery" name = "requery" list="depList">
-    <datalist id="depList">
-        {% for i in list %}
-        <option value="{{ i }}"></option>
-        {% endfor %}
-    </datalist>
-    <input type="hidden" id="origin" name="origin" value="{{ origin }}" >
-    <input type="submit" value="retry">
-</form>
-{% endif %}
-        <!--
-<form>
+
     Search
     <input type="text" id="q" name = "q" >
     <input type="submit" value="검색">
 </form>
--->
-<!--
+
+
 {% for i in list %}
 <table>
 <tr>
@@ -93,7 +88,7 @@
 
 {% endif %}
 
--->
+
 
 </body>
 </html>

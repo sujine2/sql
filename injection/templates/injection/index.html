@@ -1,7 +1,7 @@
 <html>
 <title>테스트</title>
 <body>
-<form action="/" method="POST">
+<form action="/view/" method="POST">
 {% csrf_token %}
     <h1>Base Info</h1>
     <p>URL: <input type="text" name="url"> </p>
@@ -22,18 +22,19 @@
     </div>
     <br>
 
-    RESULT
+ <!--   RESULT
 
     <div>
       <input type="radio" id="know" name="result" value="know" checked>
       <label for="know">know</label>
     </div>
 
-    <div>
+   <div>
       <input type="radio" id="query" name="result" value="query">
       <label for="query">query</label>
     </div>
-    <input type="submit" value="Detections Initiated">
+    <br>-->
+    <input type="submit" value="Send">
 </form>
 </body>
 </html>
