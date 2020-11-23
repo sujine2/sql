@@ -51,10 +51,14 @@
 {% if pw %}
         <h1> parmas value : {{pw}} </h1>
 {% endif %}
+{% if column_cnt %}
+        <h1> column : {{column_cnt}} </h1>
+{% endif %}
 <br>
 <hr>
 <br>
-        {% if data %}
+
+{% if data %}
 <form action="/retry/", method="POST">
 {% csrf_token %}
                 Query

