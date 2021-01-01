@@ -43,13 +43,16 @@
             <h1> Result : success single quote.</h1>
         {% elif integer %}
             <h1> Result : success integer. </h1>
-        {% else %}
-            <h1> Result :  Fail </h1>
         {% endif %}
 
 {% endif %}
+
 {% if pw %}
-        <h1> parmas value : {{pw}} </h1>
+        {% for key,value in pw.items %}
+            {% if value %}
+                <h1> {{key}} value : {{value}} </h1>
+            {% endif %}
+        {% endfor %}
 {% endif %}
 {% if column_cnt %}
         <h1> column : {{column_cnt}} </h1>
@@ -58,7 +61,23 @@
         <h1> DB name : {{db_name}} </h1>
 {% endif %}
 {% if table_name %}
-        <h1> table name : {{table_name}} </h1>
+        <h1> table name :
+        {% for i in table_name %}
+             {{i}},
+        {% endfor %}
+        </h1>
+{% endif %}
+{% if column_name %}
+        <h1> column name :
+         <br>
+        {% for key, value in column_name.items %}
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{key}} :
+            {% for i in value %}
+                {{i}},
+            {% endfor %}
+             <br>
+        {% endfor %}
+        </h1>
 {% endif %}
 <br>
 <hr>

