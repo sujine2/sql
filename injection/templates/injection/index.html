@@ -3,90 +3,256 @@
 
 <head>
 </head>
-<body>
-	<style>
-		.slidecontainer {
-		  width: 30%;
-		}
 
-		.slider {
-		  -webkit-appearance: none;
-		  width: 100%;
-		  height: 15px;
-		  border-radius: 5px;
-		  background: #d3d3d3;
-		  outline: none;
-		  opacity: 0.7;
-		  -webkit-transition: .2s;
-		  transition: opacity .2s;
-		}
-
-		.slider:hover {
-		  opacity: 1;
-		}
-
-		.slider::-webkit-slider-thumb {
-		  -webkit-appearance: none;
-		  appearance: none;
-		  width: 25px;
-		  height: 25px;
-		  border-radius: 50%;
-		  background: #4CAF50;
-		  cursor: pointer;
-		}
-
-		.slider::-moz-range-thumb {
-		  width: 25px;
-		  height: 25px;
-		  border-radius: 50%;
-		  background: #4CAF50;
-		  cursor: pointer;
-		}
-	</style>
+<style>
 
 
-<form id="my-form" method="post" action="/view/">
+    body
+     {
+         margin-top:20;
+         margin-bottom:50;
+         margin-left:0;
+         margin-right:0;
+
+
+      }
+
+
+    .slidecontainer {
+      width: 100%;
+    }
+
+    .slider {
+      -webkit-appearance: none;
+      width: 100%;
+      height: 15px;
+      border-radius: 5px;
+      background: #d3d3d3;
+      outline: none;
+      opacity: 0.7;
+      -webkit-transition: .2s;
+      transition: opacity .2s;
+    }
+
+    .slider:hover {
+      opacity: 1;
+    }
+
+    .slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 25px;
+      height: 25px;
+      border-radius: 50%;
+      background: #4CAF50;
+      cursor: pointer;
+    }
+
+    .slider::-moz-range-thumb {
+      width: 25px;
+      height: 25px;
+      border-radius: 50%;
+      background: #4CAF50;
+      cursor: pointer;
+    }
+
+
+    #border1{
+              margin-left: 70;
+              margin-right : 40;
+               margin-top:20;
+              float : left;
+              text-align: center;
+              box-shadow : 2px 2px 5px #999;
+
+            }
+    #border1_content{
+        padding : 40;
+        font-size: 20;
+    }
+
+    #border1:hover{
+      margin-left: 70;
+      margin-right : 40;
+      margin-top:10;
+      float : left;
+      text-align: center;
+      box-shadow : 2px 2px 20px grey;
+
+    }
+
+
+    #border2{
+              margin-left: 40;
+              margin-right :40;
+              margin-top:20;
+              float:left;
+              text-align: center;
+              box-shadow : 2px 2px 5px #999;
+
+            }
+    #border2_content{
+        height: 165;
+        padding : 40;
+        font-size:20;
+    }
+     #border2:hover{
+      margin-left: 40;
+      margin-right :40;
+      margin-top: 10;
+      float:left;
+      text-align: center;
+      box-shadow : 2px 2px 20px grey;
+
+    }
+
+    #border3{
+      margin-left: 20;
+      margin-right :500;
+      margin-top : 30;
+
+      float:right;
+      text-align: center;
+      box-shadow : 2px 2px 5px #999;
+    }
+    #border3_content{
+        padding : 40;
+        font-size:20;
+        height : 160;
+    }
+     #border3:hover{
+      margin-left: 20;
+      margin-right :500;
+      margin-top : 20;
+      float:right;
+      text-align: center;
+      box-shadow : 2px 2px 20px grey;
+
+    }
+
+    #border4{
+              margin-left: 40;
+              margin-right :40;
+              margin-top : 30;
+              float:left;
+              text-align: center;
+              box-shadow : 2px 2px 5px #999;
+            }
+     #border4_content{
+        padding : 40;
+        width : 250 ;
+        height : 160;
+        font-size:20;
+    }
+     #border4:hover{
+      margin-left: 40;
+      margin-right :40;
+      margin-top : 20;
+      float:left;
+      text-align: center;
+      box-shadow : 2px 2px 20px grey;
+    }
+
+    #btn {
+      display: inline-block;
+      border-radius: 4px;
+      background-color: black;
+      border: none;
+      color: #FFFFFF;
+      text-align: center;
+      font-size: 28px;
+      padding: 20px;
+      width: 200px;
+      transition: all 0.5s;
+      cursor: pointer;
+      float : none;
+      margin-left : 50;
+      margin-top : 190;
+    }
+
+    #btn span {
+      cursor: pointer;
+      display: inline-block;
+      position: relative;
+      transition: 0.5s;
+    }
+
+    #btn span:after {
+      content: '\00bb';
+      position: absolute;
+      opacity: 0;
+      top: 0;
+      right: -20px;
+      transition: 0.5s;
+    }
+
+    #btn:hover span {
+      padding-right: 25px;
+    }
+
+    #btn:hover span:after {
+      opacity: 1;
+      right: 0;
+    }
+
+
+</style>
+
+<body style=" background-color:ivory;">
+<form class="my-form" method="post" action="/view/">
 {% csrf_token %}
-    <h1>Base Info</h1>
-    <p>URL: <input type="text" name="url"> </p>
-    <p>COOKIE: <input type="text" name="cookie"> </p>
-    <p> FIND: <input type="text" name="find"></p>
-    <h1>Attack Parameter</h1>
-    <p> NAME: <input type="text" name="name"> </p>
-    <p> VALUE: <input type="text" name="parameter"></p>
 
-    <h1>Want to know</h1>
-    <p> NAME: <input type="text" name="know"> </p>
+    <div id = "border1"  style="background-color:green; border-radius: 30px 30px 0 0;">
+        <h1>Base Info</h1>
+        <div id ="border1_content" style="background-color:white;">
+            <p>URL: <input type="text" name="url"> </p>
+            <p>COOKIE: <input type="text" name="cookie"> </p>
+            <p> FIND: <input type="text" name="find"></p>
+        </div>
+    </div>
 
-    <!--
-    <h1>PRAMETER</h1>
-    <p> Other PARAMETER: <input type="text" name="parameter2_name"></p>
-    <p> VALUE: <input type="text" name="parameter2_value"></p>
-    -->
-    METHOD
-    <div>
-      <input type="radio" id="get" name="method" value="get" checked>
-      <label for="get">get</label>
+
+    <div id = "border2" style="background-color:#FF0066; border-radius: 30px 30px 0 0;">
+        <h1>Attack Parameter</h1>
+        <div id ="border2_content" style="background-color:white;">
+            <p> NAME: <input type="text" name="name"> </p>
+            <p> VALUE: <input type="text" name="parameter"></p>
+        </div>
     </div>
-    <div>
-      <input type="radio" id="post" name="method" value="POST">
-      <label for="post">post</label>
+
+    <br> <br> <br> <br>
+
+    <div id = "border3" style="background-color:#009297; border-radius: 30px 30px 0 0;">
+        <h1>Want to know</h1>
+        <div id ="border3_content" style="background-color:white;">
+            <p> NAME: <input type="text" name="know"> </p>
+                METHOD
+            <div>
+              <input type="radio" id="get" name="method" value="get" checked>
+              <label for="get">get</label>
+            </div>
+            <div>
+              <input type="radio" id="post" name="method" value="POST">
+              <label for="post">post</label>
+            </div>
+        </div>
     </div>
-    <br>
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
 
+     <div id = "border4" style="background-color:#FCCC00; border-radius: 30px 30px 0 0;">
+        <h1>Brute Range</h1>
+         <div id ="border4_content" style="background-color:white;">
+            <div class="slidecontainer">
+              <input type="range" min="1" max="100" name="slider" value="50" class="slider" id="myRange">
+              <p>Value: <span id="demo">50</span></p>
+            </div>
+         </div>
+     </div>
 
 
+    <button type="submit" id="btn"><span>send</span></button>
 
-<h1>Brute Range</h1>
-
-<div class="slidecontainer">
-  <input type="range" min="1" max="100" name="slider" value="50" class="slider" id="myRange">
-  <p>Value: <span id="demo">50</span></p>
-</div>
-
-<button type="submit" id="my-submit">send</button>
 </form>
 </body>
 <script src="https://code.jquery.com/jquery-2.2.1.min.js"></script>

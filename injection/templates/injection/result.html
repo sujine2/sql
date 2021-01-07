@@ -38,9 +38,9 @@
     <td rowspan="1" colspan="3" style="vertical-align: top; width: 30%;">
     <textarea name="origin_text" rows="8" cols="85">{{ data }}&#10;</textarea>
         {% if single %}
-            <h1> Result : success double quote.</h1>
-        {% elif double %}
             <h1> Result : success single quote.</h1>
+        {% elif double %}
+            <h1> Result : success double quote.</h1>
         {% elif integer %}
             <h1> Result : success integer. </h1>
         {% endif %}
@@ -83,7 +83,7 @@
 <hr>
 <br>
 
-{% if data %}
+
 <form action="/retry/", method="POST">
 {% csrf_token %}
                 Query
@@ -98,7 +98,7 @@
     <input type="hidden" id="origin" name="origin" value="{{ origin }}" >
     <input type="submit" value="retry">
 </form>
-{% endif %}
+
         <!--
 <form>
     Search

@@ -28,7 +28,6 @@ def findUserKeyword(target, keyword):
     bs = BeautifulSoup(target.text, 'html.parser')
     for value in pvalue:
         bs.get_text()
-        #print(value, bs.get_text())
         if value in bs.get_text():
             return 1, target.url
     return 0, target.url
