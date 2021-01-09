@@ -17,7 +17,6 @@
    width="150px" nowrap
   }
   .box {
-
     color:#000;
     margin: 60px auto 40px auto;
     padding:20px;
@@ -105,17 +104,25 @@
 
 </style>
 <body>
-    <section style=" background-color:ivory;">
     {% if ttt %}
-     <h1> Retry Attack Query</h1>
-        <td rowspan="1" colspan="3" style=" width: 30%;">
+    <section class="box">
+
+        <h1> <font size="25">Retry Attack Query</font></h1>
+
         <textarea  rows="8" cols="85">{{ ttt }}</textarea>
+    </section>
+            <section class="box2">
             {% if s%}
-            <tr><td> Result :</td> <td>Retry Success</td> </tr>
+                <h1>Result : Retry Success</h1>
             {% elif f %}
-            <tr><td>Result : Retry Fail</td></tr>
+                <h1>Result : Retry Fail</h1>
+                <br> <br> <br> <br>
+
+
+            </section><br><br>
             {% endif %}
-        </td>
+
+
     {% endif %}
 
     <!--<form action="/retry/", method="post">-->
@@ -129,15 +136,15 @@
         </td>
     </section>
     <section class="box2"><br><br>
-            <div id="suc"><font size="4" weight="bolder">
+            <font size="4" weight="bolder"><div id="suc">
             {% if single %}
                 <h1>Result : success single quote.</h1>
             {% elif double %}
-                <tr><td> Result :</td><td>success double quote.</td></tr>
+                <h1>Result :success double quote.</h1>
             {% elif integer %}
-                <tr><td> Result :</td><td>success integer.</td> </tr>
+                <h1>Result :success integer.</h1>
             {% endif %}
-            </font></div>
+            </div></font>
 
         {% endif %}
         <font size="4" weight="bolder">
